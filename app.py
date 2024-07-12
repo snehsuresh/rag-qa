@@ -15,7 +15,7 @@ from langchain.vectorstores import FAISS  # For managing a FAISS vector store
 # Import custom modules for data ingestion and vector store creation
 from QASystem.ingestion import data_ingestion, get_vector_store
 # Import custom modules for LLM and response retrieval
-from QASystem.retreivalandgeneration import get_llama2_llm, get_response_llm
+from QASystem.retrievalandgeneration import get_llama2_llm, get_response_llm
 
 # Create a Boto3 client for the Bedrock runtime service
 bedrock = boto3.client(service_name="bedrock-runtime")

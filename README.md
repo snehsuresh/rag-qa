@@ -12,9 +12,9 @@
 5. User query is sent to database, it does a similarity search, you find relevant response (context)
 6. Along with promts imput, you also pass to the LLM model the relevant response.
 
-### Step 1 till 4 is data ingestion
-### Step 5 is retreival
-### Step 6 is generation
+Step 1 - 4 is data ingestion
+Step 5 is retieval
+Step 6 is generation
 
 `aws configure`
 
