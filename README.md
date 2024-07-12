@@ -18,3 +18,9 @@
 
 `aws configure`
 
+
+
+# Deployment
+1. Create a Docker image of the app
+2. Push the image to ECR instead of dockerhub
+3. Consume it from ECR through EC2 or Lambda function, ECS, AppRunner etc..
