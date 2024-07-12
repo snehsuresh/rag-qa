@@ -1,9 +1,9 @@
 # Import necessary modules from langchain_community, langchain, and other libraries
 from langchain_community.document_loaders import PyPDFDirectoryLoader  # To load PDF documents from a directory
 from langchain.text_splitter import RecursiveCharacterTextSplitter  # To split text into manageable chunks
-from langchain.vectorstores import FAISS  # For creating and managing a FAISS vector store
+from langchain_community.vectorstores import FAISS  # For creating and managing a FAISS vector store
 from langchain_community.embeddings import BedrockEmbeddings  # To generate embeddings using AWS Bedrock
-from langchain.llms.bedrock import Bedrock  # To interact with Bedrock models
+from langchain_community.llms import Bedrock  # To interact with Bedrock models
 
 import json  # Provides methods for working with JSON data
 import os  # Provides a way to interact with the operating system
@@ -14,7 +14,7 @@ import boto3  # AWS SDK for Python, used to interact with AWS services
 bedrock = boto3.client(service_name="bedrock-runtime")
 
 # Create an instance of BedrockEmbeddings using the specified model and client
-bedrock_embeddings = BedrockEmbeddings(model_id="amazon.titan-embed-text-v1", client=bedrock)
+bedrock_embeddings = BedrockEmbeddings(model_id="amazon.titan-embed-text-v2:0", client=bedrock)
 
 # Function to ingest data from PDF files in a directory
 def data_ingestion():

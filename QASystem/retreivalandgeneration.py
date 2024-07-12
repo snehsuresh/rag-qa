@@ -1,7 +1,7 @@
 # Import necessary modules from langchain and other libraries
 from langchain.chains import RetrievalQA  # For creating a retrieval-based QA system
-from langchain.vectorstores import FAISS  # For managing a FAISS vector store
-from langchain.llms.bedrock import Bedrock  # For using Bedrock models
+from langchain_community.vectorstores import FAISS  # For managing a FAISS vector store
+from langchain_community.llms.bedrock import Bedrock  # For using Bedrock models
 import boto3  # AWS SDK for Python, used to interact with AWS services
 from langchain.prompts import PromptTemplate  # For creating prompt templates
 from QASystem.ingestion import get_vector_store, data_ingestion  # Custom module imports for data ingestion and vector store creation
@@ -11,7 +11,7 @@ from langchain_community.embeddings import BedrockEmbeddings  # To generate embe
 bedrock = boto3.client(service_name="bedrock-runtime")
 
 # Create an instance of BedrockEmbeddings using the specified model and client
-bedrock_embeddings = BedrockEmbeddings(model_id="amazon.titan-embed-text-v1", client=bedrock)
+bedrock_embeddings = BedrockEmbeddings(model_id="amazon.titan-embed-text-v2:0", client=bedrock)
 
 # Define a prompt template for the QA system
 prompt_template = """
@@ -35,7 +35,7 @@ PROMPT = PromptTemplate(
 
 # Function to create and return a Bedrock LLM instance
 def get_llama2_llm():
-    llm = Bedrock(model_id="meta.llama2-13b-chat-v1", client=bedrock)
+    llm = Bedrock(model_id="meta.llama3-8b-instruct-v1:0", client=bedrock)
     return llm
 
 # Function to get a response from the LLM using the QA system
