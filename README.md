@@ -60,4 +60,3 @@ aws configure
 1. **Follow the steps outlined in the HuggingFace blog on SageMaker deployment.**
 2. **Check Deployment Endpoint**
 3. **Go to the SageMaker homepage, navigate to Deployment -> Endpoint to find your deployed application.**
-This comprehensive guide helps you deploy and manage a Retrieval-Augmented Generation application using various AWS services, Langchain, HuggingFace, and Docker.
