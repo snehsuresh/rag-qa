@@ -28,6 +28,14 @@ def main():
     # Set the configuration for the Streamlit page
     st.set_page_config("QA with Doc")
     
+    # File uploader to upload PDF files
+    uploaded_files = st.file_uploader("Upload PDF file", accept_multiple_files=True, type=["pdf"])
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            # Save the uploaded PDF files to the ./data directory
+            with open(os.path.join("./data", uploaded_file.name), "wb") as f:
+                f.write(uploaded_file.getbuffer())
+        st.success("Uploaded files successfully!")
     # Set the header for the Streamlit app
     st.header("QA with Doc using langchain and AWS Bedrock")
     
@@ -37,6 +45,7 @@ def main():
     # Create a sidebar for additional options
     with st.sidebar:
         st.title("Update or Create the Vector Store")
+
         
         # Button to update the vector store
         if st.button("Vectors Update"):

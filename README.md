@@ -1,47 +1,64 @@
-# Deploying RAG app using AWS(Lambda, ECR), Langchain, HuggingFace, Docker
+# Deploying RAG App Using AWS (Lambda, ECR), Langchain, HuggingFace, Docker
 
-## If on any given input promts if the LLM model is not able to generate output. You have 2 options
-1. RAG
+## Introduction
+
+This project demonstrates deploying a Retrieval-Augmented Generation (RAG) application using AWS services such as Lambda and ECR, along with Langchain, HuggingFace, and Docker. The RAG approach enhances the capabilities of large language models (LLMs) by integrating a retrieval mechanism that fetches relevant information from a knowledge base to provide more accurate responses.
+
+## Handling LLM Inability to Generate Output
+
+If the LLM model cannot generate an output for a given input prompt, you have two options:
+1. Retrieval-Augmented Generation (RAG)
 2. Finetuning
 
-## Retrieval-augmented generation (RAG) - Few short prompting
-1. Collect data from data scource and store in knowledge base
-2. Create chunks of data 
-3. Convert chunks into embeddings
-4. Store embeddings to vector database
-5. User query is sent to database, it does a similarity search, you find relevant response (context)
-6. Along with promts imput, you also pass to the LLM model the relevant response.
+## Retrieval-Augmented Generation (RAG) - Few-shot Prompting
 
-Step 1 - 4 is data ingestion
-Step 5 is retieval
-Step 6 is generation
+1. **Collect data from data sources and store it in a knowledge base.**
+2. **Create chunks of data.**
+3. **Convert chunks into embeddings.**
+4. **Store embeddings in a vector database.**
+5. **User query is sent to the database, performs a similarity search, and finds the relevant response (context).**
+6. **Pass the relevant response along with the prompt input to the LLM model.**
 
-`aws configure`
+### Steps Breakdown
+- **Step 1-4**: Data Ingestion
+- **Step 5**: Retrieval
+- **Step 6**: Generation
 
+### AWS Configuration
+To start, configure your AWS CLI:
+```sh
+aws configure
+```
 
+## Deployment
+1. **Create a Docker Image of the App**
+2. **Push the Image to ECR**
+3. **Consume the Image from ECR**
+4. **Use services like EC2, Lambda Function, ECS, AppRunner, etc.**
+5. **Start an App Runner Service.**
+6. **Configure it to run your Streamlit service.**
 
-# Deployment
-1. Create a Docker image of the app
-2. Push the image to ECR instead of dockerhub
-3. Consume it from ECR through any of the sercices like EC2, Lambda function, ECS, AppRunner etc..
-4. Start an App Runner service and configure it to your streamlit service.
+## CI/CD
+### Automate Image Creation
+**On every git push, update the image in the ECR.**
 
-# CI/CD
-1. On every change create a new image
-2. Configure App Runner in such a way that it fetches image from EC2 and automatically deploys it.
+### Configure App Runner
+**Set it up to fetch the latest image from ECR and automatically deploy it.**
 
-# Doing the same with huggingface and sagemaker
-1. You fetch an LLM like llama2 from huggigface
-2. Push it to huggingface hub.
-3. Deploy it to AWS Sagemaker Studio. (Create an instance)
-
-# Sagemaker
-1. You need to check your service quota for the required instance size for your llama model. 
-2. Let's say you need ml.g5.12xlarge size instance. Request for it through Service Quora service of AWS. (Beware: Too pricey)
-3. Then go back to sagemaker and you will be able to access it
-4. Checkout https://huggingface.co/blog/sagemaker-huggingface-llm
-5. After deployment, go to sagemaker homepage and check the deployment -> endpoint to find your deployed app.
-
-
-
-
+Using HuggingFace and SageMaker
+Fetch an LLM from HuggingFace
+Example: Llama2
+Push the Model to HuggingFace Hub
+Deploy the Model to AWS SageMaker Studio
+Create an instance and deploy the model.
+SageMaker Deployment
+Service Quota Check
+Check your service quota for the required instance size (e.g., ml.g5.12xlarge) for your Llama model.
+Request the required instance size through AWS Service Quota service (Note: Can be expensive).
+Instance Access
+After approval, access the instance in SageMaker.
+Deployment Process
+Follow the steps outlined in the HuggingFace blog on SageMaker deployment.
+Check Deployment Endpoint
+Go to the SageMaker homepage, navigate to Deployment -> Endpoint to find your deployed application.
+This comprehensive guide helps you deploy and manage a Retrieval-Augmented Generation application using various AWS services, Langchain, HuggingFace, and Docker.
