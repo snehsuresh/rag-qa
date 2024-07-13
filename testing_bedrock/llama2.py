@@ -9,7 +9,7 @@ print("imported successfully...")
 
 # Define the prompt to be used as input for the model
 prompt = """
-        you are a cricket expert now just tell me when RCB will win the IPL?
+        When will RCB win the IPL tournament?
 """
 
 # Create a Boto3 client for the Bedrock runtime service
