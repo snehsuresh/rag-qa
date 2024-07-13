@@ -45,20 +45,19 @@ aws configure
 ### Configure App Runner
 **Set it up to fetch the latest image from ECR and automatically deploy it.**
 
-Using HuggingFace and SageMaker
-Fetch an LLM from HuggingFace
-Example: Llama2
-Push the Model to HuggingFace Hub
-Deploy the Model to AWS SageMaker Studio
-Create an instance and deploy the model.
-SageMaker Deployment
-Service Quota Check
-Check your service quota for the required instance size (e.g., ml.g5.12xlarge) for your Llama model.
-Request the required instance size through AWS Service Quota service (Note: Can be expensive).
-Instance Access
-After approval, access the instance in SageMaker.
-Deployment Process
-Follow the steps outlined in the HuggingFace blog on SageMaker deployment.
-Check Deployment Endpoint
-Go to the SageMaker homepage, navigate to Deployment -> Endpoint to find your deployed application.
+## Using HuggingFace and SageMaker
+1. **Fetch an LLM from HuggingFace (Example: Llama2)**
+2. **Push the Model to HuggingFace's Model Hub.**
+3. **Deploy the Model to AWS SageMaker Studio.**
+4. **Create an instance and deploy the model.**
+
+### SageMaker Deployment
+1. **Service Quota Check**: Check your service quota for the required instance size (e.g., ml.g5.12xlarge) for your Llama model.
+2. **Request the required instance size** through AWS Service Quota service (Note: Can be expensive).
+3. **After approval, access the instance in SageMaker.**
+
+#### Deployment Process
+1. **Follow the steps outlined in the HuggingFace blog on SageMaker deployment.**
+2. **Check Deployment Endpoint**
+3. **Go to the SageMaker homepage, navigate to Deployment -> Endpoint to find your deployed application.**
 This comprehensive guide helps you deploy and manage a Retrieval-Augmented Generation application using various AWS services, Langchain, HuggingFace, and Docker.
