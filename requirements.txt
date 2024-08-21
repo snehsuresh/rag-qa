@@ -12,6 +12,6 @@ pypdf
 faiss-cpu
 watchdog
 boto3
-
+langchain-aws
 
 -e .

@@ -3,17 +3,24 @@ from langchain.chains import RetrievalQA  # For creating a retrieval-based QA sy
 from langchain_community.vectorstores import FAISS  # For managing a FAISS vector store
 from langchain_community.llms.bedrock import Bedrock  # For using Bedrock models
 import boto3  # AWS SDK for Python, used to interact with AWS services
+import os
 from langchain.prompts import PromptTemplate  # For creating prompt templates
 from QASystem.ingestion import (
     get_vector_store,
     data_ingestion,
 )  # Custom module imports for data ingestion and vector store creation
-from langchain_community.embeddings import (
-    BedrockEmbeddings,
-)  # To generate embeddings using AWS Bedrock
+from langchain_aws import BedrockEmbeddings  # To generate embeddings using AWS Bedrock
+
+access_key = os.getenv("AWS_ACCESS_KEY_ID")
+secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
 
 # Create a Boto3 client for the Bedrock runtime service
-bedrock = boto3.client(service_name="bedrock-runtime")
+bedrock = boto3.client(
+    service_name="bedrock-runtime",
+    aws_access_key_id=access_key,
+    aws_secret_access_key=secret_access_key,
+)
+
 
 # Create an instance of BedrockEmbeddings using the specified model and client
 bedrock_embeddings = BedrockEmbeddings(

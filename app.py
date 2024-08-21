@@ -1,74 +1,71 @@
-# Import necessary modules
-import json  # Provides methods for working with JSON data
-import os  # Provides a way to interact with the operating system
-import sys  # Provides access to some variables used or maintained by the interpreter
-import boto3  # AWS SDK for Python, used to interact with AWS services
-import streamlit as st  # Library for creating web applications
-
-# Import necessary modules from langchain_community and langchain
-from langchain_community.embeddings import BedrockEmbeddings  # To generate embeddings using AWS Bedrock
-from langchain.llms.bedrock import Bedrock  # For using Bedrock models
-from langchain.prompts import PromptTemplate  # For creating prompt templates
-from langchain.chains import RetrievalQA  # For creating a retrieval-based QA system
-from langchain.vectorstores import FAISS  # For managing a FAISS vector store
-
-# Import custom modules for data ingestion and vector store creation
+from flask import Flask, request, render_template, redirect, url_for, flash
+import os
+import boto3
+from langchain_aws import BedrockEmbeddings
+from langchain_community.llms import Bedrock
+from langchain.prompts import PromptTemplate
+from langchain.chains import RetrievalQA
+from langchain_community.vectorstores import FAISS
 from QASystem.ingestion import data_ingestion, get_vector_store
-# Import custom modules for LLM and response retrieval
 from QASystem.retrievalandgeneration import get_llama2_llm, get_response_llm
 
+app = Flask(__name__)
+app.secret_key = "supersecretkey"  # Needed for flash messages
+UPLOAD_FOLDER = "./data"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+access_key = os.getenv("AWS_ACCESS_KEY_ID")
+secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
 # Create a Boto3 client for the Bedrock runtime service
-bedrock = boto3.client(service_name="bedrock-runtime")
+bedrock = boto3.client(
+    service_name="bedrock-runtime",
+    aws_access_key_id=access_key,
+    aws_secret_access_key=secret_access_key,
+)
 
 # Create an instance of BedrockEmbeddings using the specified model and client
-bedrock_embeddings = BedrockEmbeddings(model_id="amazon.titan-embed-text-v2:0", client=bedrock)
+bedrock_embeddings = BedrockEmbeddings(
+    model_id="amazon.titan-embed-text-v2:0", client=bedrock
+)
 
-# Main function to run the Streamlit application
-def main():
-    # Set the configuration for the Streamlit page
-    st.set_page_config("QA with Doc")
-    
-    # File uploader to upload PDF files
-    uploaded_files = st.file_uploader("Upload PDF file", accept_multiple_files=True, type=["pdf"])
-    if uploaded_files:
-        for uploaded_file in uploaded_files:
-            # Save the uploaded PDF files to the ./data directory
-            with open(os.path.join("./data", uploaded_file.name), "wb") as f:
-                f.write(uploaded_file.getbuffer())
-        st.success("Uploaded files successfully!")
-    # Set the header for the Streamlit app
-    st.header("QA with Doc using langchain and AWS Bedrock")
-    
-    # Create a text input box for the user to ask a question
-    user_question = st.text_input("Ask a question from the PDF files")
-    
-    # Create a sidebar for additional options
-    with st.sidebar:
-        st.title("Update or Create the Vector Store")
 
-        
-        # Button to update the vector store
-        if st.button("Vectors Update"):
-            with st.spinner("Processing..."):
-                # Ingest data from PDF files and create/update the vector store
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if request.method == "POST":
+        if "file" in request.files:
+            uploaded_files = request.files.getlist("file")
+            for uploaded_file in uploaded_files:
+                if uploaded_file.filename != "":
+                    file_path = os.path.join(
+                        app.config["UPLOAD_FOLDER"], uploaded_file.filename
+                    )
+                    uploaded_file.save(file_path)
+            flash("Uploaded files successfully!", "success")
+
+        if "update_vectors" in request.form:
+            with app.app_context():
                 docs = data_ingestion()
                 get_vector_store(docs)
-                st.success("Done")
-                
-        # Button to use the Llama model for QA
-        if st.button("Llama Model"):
-            with st.spinner("Processing..."):
-                # Load the FAISS index from local storage
-                faiss_index = FAISS.load_local("faiss_index", bedrock_embeddings, allow_dangerous_deserialization=True)
-                
-                # Get the Bedrock LLM instance
-                llm = get_llama2_llm()
-                
-                # Get the response from the QA system and display it
-                st.write(get_response_llm(llm, faiss_index, user_question))
-                st.success("Done")
+                flash("Vector store updated successfully!", "success")
 
-# Execute the main function when the script is run
+    return render_template("index.html")
+
+
+@app.route("/ask", methods=["GET", "POST"])
+def answer():
+    print("Asked")
+    if request.method == "POST":
+        user_question = request.form["question"]
+        faiss_index = FAISS.load_local(
+            "faiss_index",
+            bedrock_embeddings,
+            allow_dangerous_deserialization=True,
+        )
+        print("faiss index", faiss_index)
+        llm = get_llama2_llm()
+        response = get_response_llm(llm, faiss_index, user_question)
+        return render_template("index.html", response=response)
+
+
 if __name__ == "__main__":
-    # This is the main method
-    main()
+    app.run(host="0.0.0.0", port=82)
