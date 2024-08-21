@@ -11,6 +11,7 @@ awscli
 pypdf
 faiss-cpu
 watchdog
+boto3
 
 
 -e .
