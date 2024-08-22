@@ -8,6 +8,7 @@ pypdf
 faiss-cpu
 flask
 gunicorn==23.0.0
+PyPDF2
 
 
 -e .
