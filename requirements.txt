@@ -6,6 +6,7 @@ boto3
 chromadb
 pypdf
 faiss-cpu
+flask
 
 
 -e .

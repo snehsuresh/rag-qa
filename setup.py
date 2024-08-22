@@ -19,5 +19,6 @@ setup(
         "streamlit",
         "pypdf",
         "faiss-cpu",
+        "flask",
     ],
 )
