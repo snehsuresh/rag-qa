@@ -11,16 +11,10 @@ from QASystem.ingestion import (
 )  # Custom module imports for data ingestion and vector store creation
 from langchain_aws import BedrockEmbeddings  # To generate embeddings using AWS Bedrock
 
-access_key = os.getenv("AWS_ACCESS_KEY_ID")
-secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-aws_region = os.getenv("AWS_REGION")
-# Create a Boto3 client for the Bedrock runtime service
-bedrock = boto3.client(
-    service_name="bedrock-runtime",
-    aws_access_key_id=access_key,
-    aws_secret_access_key=secret_access_key,
-    region_name=aws_region,
-)
+from aws_clients import AWSClients
+
+s3 = AWSClients.get_s3_client()
+bedrock = AWSClients.get_bedrock_client()
 
 
 # Create an instance of BedrockEmbeddings using the specified model and client

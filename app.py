@@ -8,22 +8,17 @@ from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import FAISS
 from QASystem.ingestion import data_ingestion, get_vector_store
 from QASystem.retrievalandgeneration import get_llama2_llm, get_response_llm
+from aws_clients import AWSClients
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Needed for flash messages
-UPLOAD_FOLDER = "./data"
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-access_key = os.getenv("AWS_ACCESS_KEY_ID")
-secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-aws_region = os.getenv("AWS_REGION")
+
+S3_BUCKET = os.getenv("S3_BUCKET_NAME")
 # Create a Boto3 client for the Bedrock runtime service
-bedrock = boto3.client(
-    service_name="bedrock-runtime",
-    aws_access_key_id=access_key,
-    aws_secret_access_key=secret_access_key,
-    region_name=aws_region,
-)
+s3 = AWSClients.get_s3_client()
+bedrock = AWSClients.get_bedrock_client()
+
 
 # Create an instance of BedrockEmbeddings using the specified model and client
 bedrock_embeddings = BedrockEmbeddings(
@@ -38,15 +33,18 @@ def index():
             uploaded_files = request.files.getlist("file")
             for uploaded_file in uploaded_files:
                 if uploaded_file.filename != "":
-                    file_path = os.path.join(
-                        app.config["UPLOAD_FOLDER"], uploaded_file.filename
-                    )
-                    uploaded_file.save(file_path)
+                    new_filename = "latestdoc"
+                    # Upload the file to S3 with the new filename
+                    s3.upload_fileobj(uploaded_file, S3_BUCKET, new_filename)
+                    # file_path = os.path.join(
+                #     app.config["UPLOAD_FOLDER"], uploaded_file.filename
+                # )
+                # uploaded_file.save(file_path)
             flash("Uploaded files successfully!", "success")
 
         if "update_vectors" in request.form:
             with app.app_context():
-                docs = data_ingestion()
+                docs = data_ingestion(S3_BUCKET)
                 get_vector_store(docs)
                 flash("Vector store updated successfully!", "success")
 

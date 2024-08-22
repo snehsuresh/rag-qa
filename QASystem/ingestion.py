@@ -1,7 +1,4 @@
 # Import necessary modules from langchain_community, langchain, and other libraries
-from langchain_community.document_loaders import (
-    PyPDFDirectoryLoader,
-)  # To load PDF documents from a directory
 from langchain.text_splitter import (
     RecursiveCharacterTextSplitter,
 )  # To split text into manageable chunks
@@ -9,24 +6,12 @@ from langchain_community.vectorstores import (
     FAISS,
 )  # For creating and managing a FAISS vector store
 from langchain_aws import BedrockEmbeddings  # To generate embeddings using AWS Bedrock
-from langchain_community.llms import Bedrock  # To interact with Bedrock models
+import io
+from aws_clients import AWSClients
+from PyPDF2 import PdfReader
 
-import json  # Provides methods for working with JSON data
-import os  # Provides a way to interact with the operating system
-import sys  # Provides access to some variables used or maintained by the interpreter
-import boto3  # AWS SDK for Python, used to interact with AWS services
-
-
-access_key = os.getenv("AWS_ACCESS_KEY_ID")
-secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-aws_region = os.getenv("AWS_REGION")
-# Create a Boto3 client for the Bedrock runtime service
-bedrock = boto3.client(
-    service_name="bedrock-runtime",
-    aws_access_key_id=access_key,
-    aws_secret_access_key=secret_access_key,
-    region_name=aws_region,
-)
+s3 = AWSClients.get_s3_client()
+bedrock = AWSClients.get_bedrock_client()
 
 
 # Create an instance of BedrockEmbeddings using the specified model and client
@@ -35,14 +20,38 @@ bedrock_embeddings = BedrockEmbeddings(
 )
 
 
-# Function to ingest data from PDF files in a directory
-def data_ingestion():
-    # Load PDF documents from the specified directory
-    loader = PyPDFDirectoryLoader("./data")
-    documents = loader.load()
+class Document:
+    def __init__(self, page_content, metadata):
+        self.page_content = page_content
+        self.metadata = metadata
 
-    # Split the loaded documents into chunks using a recursive character text splitter
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=1000)
+
+# Function to ingest data from PDF files in a directory
+def data_ingestion(bucket_name, file_key="latestdoc"):
+    # Load PDF documents from the specified directory
+    # loader = PyPDFDirectoryLoader("./data")
+    # documents = loader.load()
+
+    # # Split the loaded documents into chunks using a recursive character text splitter
+    # text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=1000)
+    # docs = text_splitter.split_documents(documents)
+
+    # # Return the split documents
+    # return docs
+    file_obj = s3.get_object(Bucket=bucket_name, Key=file_key)
+    file_content = file_obj["Body"].read()
+
+    # Load the PDF using PyPDF2
+    pdf_reader = PdfReader(io.BytesIO(file_content))
+    text = ""
+    for page in pdf_reader.pages:
+        text += page.extract_text()
+
+    # Create a document structure (assuming LangChain requires this format)
+    documents = [Document(page_content=text, metadata={"source": file_key})]
+
+    # Split the loaded document into chunks using a recursive character text splitter
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     docs = text_splitter.split_documents(documents)
 
     # Return the split documents
@@ -64,7 +73,7 @@ def get_vector_store(docs):
 # Main execution block
 if __name__ == "__main__":
     # Ingest data from PDF files
-    docs = data_ingestion()
+    docs = data_ingestion("rag-app-live")
 
     # Create and save the FAISS vector store from the ingested documents
     get_vector_store(docs)
