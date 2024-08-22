@@ -13,12 +13,13 @@ from langchain_aws import BedrockEmbeddings  # To generate embeddings using AWS 
 
 access_key = os.getenv("AWS_ACCESS_KEY_ID")
 secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-
+aws_region = os.getenv("us-east-1")
 # Create a Boto3 client for the Bedrock runtime service
 bedrock = boto3.client(
     service_name="bedrock-runtime",
     aws_access_key_id=access_key,
     aws_secret_access_key=secret_access_key,
+    region_name=aws_region,
 )
 
 

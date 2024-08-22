@@ -16,11 +16,13 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 access_key = os.getenv("AWS_ACCESS_KEY_ID")
 secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+aws_region = os.getenv("AWS_REGION")
 # Create a Boto3 client for the Bedrock runtime service
 bedrock = boto3.client(
     service_name="bedrock-runtime",
     aws_access_key_id=access_key,
     aws_secret_access_key=secret_access_key,
+    region_name=aws_region,
 )
 
 # Create an instance of BedrockEmbeddings using the specified model and client
