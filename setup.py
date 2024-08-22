@@ -12,7 +12,7 @@ setup(
         "bs4",
         "tiktoken",
         "openai",
-        "boto3==1.34.37",
+        "boto3",
         "langchain_community",
         "chromadb",
         "awscli",
