@@ -7,6 +7,7 @@ chromadb
 pypdf
 faiss-cpu
 flask
+gunicorn==23.0.0
 
 
 -e .
